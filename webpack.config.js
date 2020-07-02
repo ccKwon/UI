@@ -1,8 +1,9 @@
 let path = require('path')
 let HtmlWebpackPlugin = require('html-webpack-plugin')
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 module.exports = {
     // 入口文件
-    entry: './src/index.js',
+    entry: './src/main.js',
     output: {
         // 输出文件名称
         filename: 'bundle.js',
@@ -20,6 +21,15 @@ module.exports = {
         // 对某个格式的文件进行转换处理
         rules: [
             {
+                test: /\.js$/,
+                loader: 'babel-loader',
+                exclude: /node_modules/,
+            },
+            {
+                test: /\.vue$/,  // 匹配到该的文件由该规则处理
+                use: 'vue-loader'
+            },
+            {
                 // \:转义 默认.是匹配全部   $:以..结束
                 // 匹配后缀名为CSS的文件
                 test: /\.css$/,
@@ -30,6 +40,22 @@ module.exports = {
                     // 将css文件转换为js
                     'css-loader'
                 ]
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader',
+                    'sass-loader'
+                ],
+            },
+            {
+                test: /\.sass$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader',
+                    'sass-loader?indentedSyntax'
+                ],
             },
             {
                 // 匹配图片文件
@@ -50,17 +76,7 @@ module.exports = {
                 test: /\.hrml$/,
                 loader: 'html-loader'
             },
-            {
-                test: /\.js$/,
-                exclude: /(node_modules|bower_components)/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env'],
-                        plugins: [require('@babel/plugin-transform-object-rest-spread')]
-                    }
-                }
-            }
+
         ]
     },
 
@@ -68,8 +84,11 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             // index.html文件位置
-            template: './src/index.html'
-        })
+            filename: 'index.html',
+            template: 'src/public/index.html',
+            inject: true
+        }),
+        new VueLoaderPlugin()
     ],
 
     // 
